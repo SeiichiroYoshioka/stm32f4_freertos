@@ -14,14 +14,14 @@ CORE=./Core/src
 DEBUG=./Debug/SEGGER
 RTOS= ./FreeRTOS/Source
 
-SOURCES= $(wildcard $(CORE)/*.c) \
+SOURCES:= $(wildcard $(CORE)/*.c) \
 		 $(wildcard $(DEBUG)/*.c) $(wildcard $(DEBUG)/*.S) \
 		 $(wildcard $(HAL)/*.c) \
 		 $(wildcard $(DRIVER)/*.c) $(wildcard $(DRIVER)/*.s) \
 		 $(wildcard $(RTOS)/*.c) $(wildcard $(RTOS)/portable/GCC/ARM_CM4F/*.c) $(wildcard $(RTOS)/portable/MemMang/heap_3.c)
 		 
-OBJECTS= \
-	$(patsubst %.c,%.o,$(patsubst %.S,%.o,$(SOURCES))) 
+OBJECTS:= \
+	$(patsubst %.c,%.o,$(patsubst %.S,%.o,$(patsubst %.s,%.o,$(SOURCES))))
 
 INCLUDE= \
 	-I ./Drivers/CMSIS/Core/Include \
@@ -66,6 +66,6 @@ stm32f4.s: stm32f4.elf
 
 clean:
 	rm -f stm32f4.bin stm32f4.elf stm32f4.map stm32f4.s ${OBJECTS}
-		  
+	echo ${OBJECTS}
 
 .PHONY: all clean
