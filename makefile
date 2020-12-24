@@ -13,12 +13,14 @@ HAL=./Drivers/STM32F4xx_HAL_Driver/Src
 CORE=./Core/src
 DEBUG=./Debug/SEGGER
 RTOS= ./FreeRTOS/Source
+BSP = ./Drivers/BSP/STM32F4xx-Nucleo
 
 SOURCES:= $(wildcard $(CORE)/*.c) \
 		 $(wildcard $(DEBUG)/*.c) $(wildcard $(DEBUG)/*.S) \
 		 $(wildcard $(HAL)/*.c) \
-		 $(wildcard $(DRIVER)/*.c) $(wildcard $(DRIVER)/*.s) \
-		 $(wildcard $(RTOS)/*.c) $(wildcard $(RTOS)/portable/GCC/ARM_CM4F/*.c) $(wildcard $(RTOS)/portable/MemMang/heap_3.c)
+		 $(wildcard $(DRIVER)/*.c) $(wildcard $(DRIVER)/startup_stm32f401xe.s) \
+		 $(wildcard $(RTOS)/*.c) $(wildcard $(RTOS)/portable/GCC/ARM_CM4F/*.c) $(wildcard $(RTOS)/portable/MemMang/heap_3.c) \
+		 $(wildcard $(BSP)/*.c)
 		 
 OBJECTS:= \
 	$(patsubst %.c,%.o,$(patsubst %.S,%.o,$(patsubst %.s,%.o,$(SOURCES))))
@@ -31,7 +33,8 @@ INCLUDE= \
 	-I ./FreeRTOS/Source/portable/Common \
 	-I ./Core/inc \
 	-I ./Debug/SEGGER \
-	-I ./Drivers/STM32F4xx_HAL_Driver/Inc
+	-I ./Drivers/STM32F4xx_HAL_Driver/Inc \
+	-I ./Drivers/BSP/STM32F4xx-Nucleo
 
 LSCRIPT=STM32F401RETx_FLASH.ld
 
@@ -55,10 +58,13 @@ stm32f4.srec: stm32f4.elf
 stm32f4.elf: $(OBJECTS) $(LSCRIPT)
 	$(LD) $(LDFLAGS) $(OBJECTS) -o $@ 
 
-%.c.o: %.c	
+%.o: %.c
 	$(CC) -c $(CFLAGS) $< -o $@
 
-%.S.o: %.S	
+%.o: %.S
+	$(CC) -c $(CFLAGS) $< -o $@
+
+%.o: %.s
 	$(CC) -c $(CFLAGS) $< -o $@
 
 stm32f4.s: stm32f4.elf
@@ -66,6 +72,5 @@ stm32f4.s: stm32f4.elf
 
 clean:
 	rm -f stm32f4.bin stm32f4.elf stm32f4.map stm32f4.s ${OBJECTS}
-	echo ${OBJECTS}
 
 .PHONY: all clean

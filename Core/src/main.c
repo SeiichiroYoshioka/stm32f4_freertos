@@ -1,4 +1,6 @@
 #include "stm32f401xe.h"
+#include "stm32f4xx_hal_def.h"
+#include "stm32f4xx_nucleo.h"
 #include "FreeRTOS.h"
 #include "task.h"
 #include "queue.h"
@@ -11,6 +13,15 @@ void taskInit(void);
 
 void prvSetupHardware(void)
 {
+    if ( HAL_OK == HAL_Init() ) {
+        SEGGER_RTT_printf(0,"HAL OK\n");
+    }
+    else {
+        SEGGER_RTT_printf(0,"HAL Error\n");      
+    }
+    Led_TypeDef led_init = LED2;
+    BSP_LED_Init(led_init);
+
     return;
 }
 
